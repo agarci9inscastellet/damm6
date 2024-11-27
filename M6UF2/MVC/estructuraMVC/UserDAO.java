@@ -16,7 +16,8 @@ public class UserDAO implements DAO<User>{
     public void add(User item) {
         // TODO Auto-generated method stub
 
-                System.out.println("Aqui peta perquè realment no estic connectat");
+                System.out.println("Aqui petaria perquè realment no estic connectat");
+                if (conn == null) return;
                 try (Statement statement = conn.createStatement()) {
                     
                   //  ResultSet resultSet = statement.executeQuery("INSERT  ...");
