@@ -18,6 +18,7 @@ public class Controller {
 			UserDAO userDAO = new UserDAO(conn);
 			
 			// mainView.mainMenu()
+			int opction = mainView.mainMenu();
 			// Afegir Usuari
 			// Llistar usuaris
 	
