@@ -21,8 +21,8 @@ public class App
         System.out.println( "Hello World!" );
 
         try {
-           // Connection conn = ConnectionManager.getConnection();
-           Connection conn = DriverManager.getConnection("jdbc:mysql://mysql-rfam-public.ebi.ac.uk:4497/Rfam","rfamro","");
+            Connection conn = ConnectionManager.getConnection();
+          // Connection conn = DriverManager.getConnection("jdbc:mysql://mysql-rfam-public.ebi.ac.uk:4497/Rfam","rfamro","");
             // Close the connection
             System.out.println("OLE!");     
 
