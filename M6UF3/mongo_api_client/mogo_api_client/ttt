@@ -1,0 +1,130 @@
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+
+public class ApiClient {
+
+    private static final String BASE_URL = "http://localhost:3000/users";  // URL de la API
+    private static ObjectMapper objectMapper = new ObjectMapper();  // Instància de Jackson per serialitzar i deserialitzar JSON
+
+    public static void main(String[] args) {
+        try {
+            // Crear un usuari
+            User newUser = new User(0, "Alice", "alice@example.com");
+            String createdUserJson = sendPostRequest(BASE_URL, newUser);
+            User createdUser = objectMapper.readValue(createdUserJson, User.class);
+            System.out.println("User created: " + createdUser);
+
+            // Obtenir tots els usuaris
+            String allUsersJson = sendGetRequest(BASE_URL);
+            List<User> allUsers = objectMapper.readValue(allUsersJson, objectMapper.getTypeFactory().constructCollectionType(List.class, User.class));
+            System.out.println("All Users: " + allUsers);
+
+            // Obtenir un usuari per ID (suposant que l'ID és 1)
+            String userByIdJson = sendGetRequest(BASE_URL + "/1");
+            User userById = objectMapper.readValue(userByIdJson, User.class);
+            System.out.println("User with ID 1: " + userById);
+
+            // Actualitzar un usuari (suposant que l'ID és 1)
+            User updateUser = new User(1, "Alice Smith", "alice.smith@example.com");
+            String updatedUserJson = sendPutRequest(BASE_URL + "/1", updateUser);
+            User updatedUser = objectMapper.readValue(updatedUserJson, User.class);
+            System.out.println("Updated User: " + updatedUser);
+
+            // Eliminar un usuari (suposant que l'ID és 1)
+            String deleteResponse = sendDeleteRequest(BASE_URL + "/1");
+            System.out.println("Delete response: " + deleteResponse);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Mètode per realitzar una sol·licitud GET
+    public static String sendGetRequest(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Accept", "application/json");
+
+        return getResponse(connection);
+    }
+
+    // Mètode per realitzar una sol·licitud POST
+    public static String sendPostRequest(String urlString, User user) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Accept", "application/json");
+        connection.setDoOutput(true);
+
+        // Serialitzar l'objecte User a JSON
+        String jsonBody = objectMapper.writeValueAsString(user);
+
+        // Enviar cos de la sol·licitud (el JSON)
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
+            os.write(input, 0, input.length);
+        }
+
+        return getResponse(connection);
+    }
+
+    // Mètode per realitzar una sol·licitud PUT
+    public static String sendPutRequest(String urlString, User user) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("PUT");
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setRequestProperty("Accept", "application/json");
+        connection.setDoOutput(true);
+
+        // Serialitzar l'objecte User a JSON
+        String jsonBody = objectMapper.writeValueAsString(user);
+
+        // Enviar cos de la sol·licitud (el JSON)
+        try (OutputStream os = connection.getOutputStream()) {
+            byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
+            os.write(input, 0, input.length);
+        }
+
+        return getResponse(connection);
+    }
+
+    // Mètode per realitzar una sol·licitud DELETE
+    public static String sendDeleteRequest(String urlString) throws IOException {
+        URL url = new URL(urlString);
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod("DELETE");
+        connection.setRequestProperty("Accept", "application/json");
+
+        return getResponse(connection);
+    }
+
+    // Mètode per llegir la resposta de la sol·licitud
+    private static String getResponse(HttpURLConnection connection) throws IOException {
+        int status = connection.getResponseCode();
+        InputStreamReader reader;
+
+        if (status > 299) {
+            reader = new InputStreamReader(connection.getErrorStream());
+        } else {
+            reader = new InputStreamReader(connection.getInputStream());
+        }
+
+        try (BufferedReader in = new BufferedReader(reader)) {
+            String inputLine;
+            StringBuilder response = new StringBuilder();
+
+            while ((inputLine = in.readLine()) != null) {
+                response.append(inputLine);
+            }
+
+            return response.toString();
+        }
+    }
+}

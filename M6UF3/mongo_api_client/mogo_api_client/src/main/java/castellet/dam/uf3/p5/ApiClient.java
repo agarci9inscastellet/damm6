@@ -1,93 +1,100 @@
 package castellet.dam.uf3.p5;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import org.json.JSONObject;
+import java.util.Scanner;
 
 public class ApiClient {
 
-    private static final String API_URL = "http://localhost:3030/users";
-
     public static void main(String[] args) {
+        listAll();
+        User user = userForm(args);  
+        sendUserToApi(user); 
+
+
+    }
+    public static void listAll() {
         try {
-            // Create JSON object to send
-            JSONObject jsonInput = new JSONObject();
-            jsonInput.put("key1", "value1");
-            jsonInput.put("key2", "value2");
+            URL url = new URL("http://localhost:3030/users");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
 
-            String jsonResponse;
-            // Send POST request
-           // String jsonResponse = sendPostRequest(API_URL, jsonInput.toString());
-            System.out.println("POST Response: " + jsonResponse);
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+            String inputLine;
+            StringBuilder content = new StringBuilder();
+            while ((inputLine = in.readLine()) != null) {
+                content.append(inputLine);
+                System.out.println(inputLine);
+                System.out.println(".........");
+            }
 
-            // Send GET request
-            jsonResponse = sendGetRequest(API_URL);
-            System.out.println("GET Response: " + jsonResponse);
+            in.close();
+            conn.disconnect();
 
-            // Send DELETE request
-           // jsonResponse = sendDeleteRequest(API_URL + "/1"); // Assuming you want to delete the resource with ID 1
-           // System.out.println("DELETE Response: " + jsonResponse);
+            // Parse JSON response manually
+            JSONArray jsonArray = new JSONArray(content.toString());
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                User user = new User();
+                user.setName(jsonObject.getString("name"));
+                user.setEmail(jsonObject.getString("email"));
+
+                System.out.println("Name: " + user.getName());
+                System.out.println("Email: " + user.getEmail());
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public static String sendPostRequest(String urlString, String jsonInputString) throws Exception {
-        URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json; utf-8");
-        conn.setRequestProperty("Accept", "application/json");
-        conn.setDoOutput(true);
+        private static User userForm(String[] args) {
+        Scanner scanner = new Scanner(System.in);
 
-        try (OutputStream os = conn.getOutputStream()) {
-            byte[] input = jsonInputString.getBytes("utf-8");
-            os.write(input, 0, input.length);
-        }
+        System.out.print("Enter name: ");
+        String name = scanner.nextLine();
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"))) {
-            StringBuilder response = new StringBuilder();
-            String responseLine;
-            while ((responseLine = br.readLine()) != null) {
-                response.append(responseLine.trim());
-            }
-            return response.toString();
-        }
+        System.out.print("Enter email: ");
+        String email = scanner.nextLine();
+
+        User user = new User(name, email);
+        return user;
     }
 
-    public static String sendGetRequest(String urlString) throws Exception {
-        URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("GET");
-        conn.setRequestProperty("Accept", "application/json");
+    private static void sendUserToApi(User user) {
+        try {
+            URL url = new URL("http://localhost:3030/users");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json; utf-8");
+            conn.setRequestProperty("Accept", "application/json");
+            conn.setDoOutput(true);
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"))) {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("name", user.getName());
+            jsonObject.put("email", user.getEmail());
+
+            try(OutputStream os = conn.getOutputStream()) {
+                byte[] input = jsonObject.toString().getBytes("utf-8");
+                os.write(input, 0, input.length);
+            }
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
             StringBuilder response = new StringBuilder();
-            String responseLine;
+            String responseLine = null;
             while ((responseLine = br.readLine()) != null) {
                 response.append(responseLine.trim());
             }
-            return response.toString();
-        }
-    }
 
-    public static String sendDeleteRequest(String urlString) throws Exception {
-        URL url = new URL(urlString);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("DELETE");
-        conn.setRequestProperty("Accept", "application/json");
+            System.out.println("Response from server: " + response.toString());
 
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"))) {
-            StringBuilder response = new StringBuilder();
-            String responseLine;
-            while ((responseLine = br.readLine()) != null) {
-                response.append(responseLine.trim());
-            }
-            return response.toString();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }
