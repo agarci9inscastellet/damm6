@@ -22,15 +22,28 @@ const User = mongoose.model('User', userSchema);
 
 // Ruta per crear un nou usuari
 app.post('/users', async (req, res) => {
-  const { name, email } = req.body;
+  const { 'name':name, email } = req.body;
   try {
-    const user = new User({ name, email });
+    const user = new User({ name:'aaaa',email:'aaaa' });
     await user.save();
     res.status(201).json(user);
   } catch (err) {
     res.status(400).json({ message: 'Error creating user', error: err.message });
   }
 });
+
+
+// Ruta per crear un nou usuari
+app.get('/cusers', async (req, res) => {
+  const { name, email } = req.body;
+  try {
+    const user = new User({ name:'aaaa',email:'aaaa' });    await user.save();
+    res.status(201).json(user);
+  } catch (err) {
+    res.status(400).json({ message: 'Error creating user', error: err.message });
+  }
+});
+
 
 // Ruta per obtenir tots els usuaris
 app.get('/users', async (req, res) => {

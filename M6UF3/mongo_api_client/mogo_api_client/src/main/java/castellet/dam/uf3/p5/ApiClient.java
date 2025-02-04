@@ -12,9 +12,11 @@ import java.util.Scanner;
 public class ApiClient {
 
     public static void main(String[] args) {
-        listAll();
         User user = userForm(args);  
         sendUserToApi(user); 
+
+        listAll();
+
 
 
     }
@@ -44,6 +46,7 @@ public class ApiClient {
                 user.setName(jsonObject.getString("name"));
                 user.setEmail(jsonObject.getString("email"));
 
+                System.out.println("##########:  " + i);
                 System.out.println("Name: " + user.getName());
                 System.out.println("Email: " + user.getEmail());
             }
@@ -53,7 +56,10 @@ public class ApiClient {
         }
     }
 
-        private static User userForm(String[] args) {
+    private static User userForm(String[] args) {
+        System.out.println("#############################");
+        System.out.println("Add user form: \n\n");
+
         Scanner scanner = new Scanner(System.in);
 
         System.out.print("Enter name: ");
@@ -75,13 +81,19 @@ public class ApiClient {
             conn.setRequestProperty("Accept", "application/json");
             conn.setDoOutput(true);
 
+
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("name", user.getName());
             jsonObject.put("email", user.getEmail());
 
+
             try(OutputStream os = conn.getOutputStream()) {
-                byte[] input = jsonObject.toString().getBytes("utf-8");
-                os.write(input, 0, input.length);
+               // byte[] input = jsonObject.toString().getBytes("utf-8");
+               // os.write(input, 0, input.length);
+                //os.write(jsonObject.toString().getBytes("utf-8"));
+
+                System.out.println(jsonObject.toString());
+
             }
 
             BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
