@@ -1,3 +1,6 @@
+package dam.m6.uf2;
+
+
 //import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -5,10 +8,18 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+/**
+ * Hello world!
+ */
+public final class App {
+    private App() {
+    }
 
-public class Connect {
+    /**
+     * Says hello to the world.
+     * @param args The arguments of the program.
+     */
     public static void main(String[] args) {
-
         // String jdbcUrl = "jdbc:postgresql://hh-pgsql-public.ebi.ac.uk:5432/pfmegrnargs";
         // String username = "alex";
         // String password = "Castellet:17";
@@ -63,7 +74,6 @@ public class Connect {
                 e.printStackTrace();
             }
 
-            // Perform desired database operations
-
-        }
+            // Perform desired database operations    }
+    }
 }

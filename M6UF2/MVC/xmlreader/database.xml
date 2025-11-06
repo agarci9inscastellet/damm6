@@ -3,6 +3,6 @@
     <host>localhost</host>
     <port>5432</port>
     <user>alex</user>
-    <password>Castellet:17</password>
-    <database>Sports</database>
+    <password>1234</password>
+    <database>sports</database>
  </cb-config>
