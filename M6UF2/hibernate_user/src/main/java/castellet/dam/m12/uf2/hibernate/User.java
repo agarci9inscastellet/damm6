@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -18,6 +20,19 @@ public class User {
 
     @Column(name = "name")
     private String name;
+
+
+    /*************************************************************
+     * Imaginem que tenim una entitat Sport
+     * 
+     * Imaginem que un usuari pot tenir un esport preferit
+     * Vinculem les dues entitats
+     * amb una relació ManyToOne (molts usuaris poden tenir el mateix esport preferit)
+     ************************************************************/
+    // @ManyToOne
+    // @JoinColumn(name = "sport_id")
+    // private Sport sport;
+
 
     // Constructor
     public User() {}
